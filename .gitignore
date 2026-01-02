@@ -1,0 +1,18 @@
+# Cache e dados gerados
+debug/
+file-history/
+ide/
+plans/
+plugins/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+todos/
+
+# Arquivos gerados
+history.jsonl
+stats-cache.json
+
+# Downloads temporários
+downloads/
