@@ -26,13 +26,17 @@ Se não estiver instalado, instrua o usuário a instalar via:
 
 Pergunte ao usuário:
 
-1. **Qual GitLab você usa?**
+1. **Escopo da configuração:**
+   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude/settings.json`)
+   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção projects)
+
+2. **Qual GitLab você usa?**
    - GitLab.com (https://gitlab.com)
    - Self-hosted (ex: https://git.empresa.com.br)
 
-2. **Você já possui um Personal Access Token?**
+3. **Você já possui um Personal Access Token?**
 
-3. **Qual nome dar ao servidor MCP?** (opcional)
+4. **Qual nome dar ao servidor MCP?** (opcional)
    - Sugestão: `gitlab` para GitLab.com ou `gitlab-empresa` para self-hosted
 
 ### 3. Criar Personal Access Token (se necessário)
@@ -56,6 +60,8 @@ Se o usuário NÃO tiver um token, instrua:
 O token terá o formato: `glpat-XXXXXXXXXXXXXXXXXXXX`
 
 ### 4. Configurar o MCP
+
+#### Opção A: Configuração Global (Recomendado)
 
 Edite o arquivo `~/.claude/settings.json` e adicione a configuração do GitLab.
 
@@ -101,17 +107,10 @@ Edite o arquivo `~/.claude/settings.json` e adicione a configuração do GitLab.
 
 **Se já existir um `settings.json`**, mescle a configuração ao objeto `mcpServers` existente.
 
-### 5. Locais de configuração
+#### Opção B: Configuração Por Projeto
 
-O MCP pode ser configurado em diferentes locais:
+Edite o arquivo `~/.claude.json` e adicione a configuração na seção `projects`:
 
-| Arquivo | Escopo | Uso |
-|---------|--------|-----|
-| `~/.claude/settings.json` | Global | Disponível em todos os projetos |
-| `~/.claude.json` (seção projects) | Por projeto | Específico para um diretório |
-| `.mcp.json` na raiz do projeto | Por projeto | Compartilhável via git |
-
-**Exemplo de configuração por projeto no `~/.claude.json`:**
 ```json
 {
   "projects": {
@@ -122,7 +121,11 @@ O MCP pode ser configurado em diferentes locais:
           "args": ["-y", "@zereight/mcp-gitlab"],
           "env": {
             "GITLAB_PERSONAL_ACCESS_TOKEN": "glpat-XXXXX",
-            "GITLAB_API_URL": "https://git.empresa.com.br/api/v4"
+            "GITLAB_API_URL": "https://git.empresa.com.br/api/v4",
+            "GITLAB_READ_ONLY_MODE": "false",
+            "USE_GITLAB_WIKI": "true",
+            "USE_MILESTONE": "true",
+            "USE_PIPELINE": "true"
           }
         }
       }
@@ -130,6 +133,14 @@ O MCP pode ser configurado em diferentes locais:
   }
 }
 ```
+
+### 5. Resumo dos locais de configuração
+
+| Arquivo | Escopo | Quando usar |
+|---------|--------|-------------|
+| `~/.claude/settings.json` | **Global** | Usar o mesmo GitLab em todos os projetos |
+| `~/.claude.json` (seção projects) | Por projeto | GitLabs diferentes por projeto |
+| `.mcp.json` na raiz do projeto | Por projeto | Compartilhar config via git (sem tokens!)
 
 ### 6. Variáveis de ambiente opcionais
 

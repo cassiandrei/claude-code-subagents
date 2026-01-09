@@ -14,11 +14,15 @@ Execute os seguintes passos para configurar o YouTrack MCP:
 
 Pergunte ao usuário:
 
-1. **Qual é a URL base do YouTrack?**
+1. **Escopo da configuração:**
+   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude/settings.json`)
+   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção projects)
+
+2. **Qual é a URL base do YouTrack?**
    - YouTrack Cloud (ex: https://empresa.youtrack.cloud)
    - Self-hosted (ex: https://youtrack.empresa.com.br)
 
-2. **Você já possui um Permanent Token?**
+3. **Você já possui um Permanent Token?**
 
 ### 2. Criar Permanent Token (se necessário)
 
@@ -36,11 +40,48 @@ Se o usuário NÃO tiver um token, instrua:
 
 O token terá o formato: `perm:XXXXXXXX.XX-XX.XXXXXXXXXXXXXXXXXXXX`
 
-### 3. Configurar o MCP (Método Recomendado)
+### 3. Configurar o MCP
 
 **IMPORTANTE**: O comando `claude mcp add --header` não salva os headers corretamente para HTTP transport. É necessário editar manualmente o arquivo de configuração.
 
-Edite o arquivo `~/.claude.json` e adicione a configuração do YouTrack dentro da seção `mcpServers` do projeto desejado:
+#### Opção A: Configuração Global (Recomendado)
+
+Edite o arquivo `~/.claude/settings.json` e adicione a configuração do YouTrack:
+
+```json
+{
+  "mcpServers": {
+    "youtrack": {
+      "type": "http",
+      "url": "https://empresa.youtrack.cloud/mcp",
+      "headers": {
+        "Authorization": "Bearer <SEU_TOKEN>"
+      }
+    }
+  }
+}
+```
+
+**Se já existir um `settings.json` com outros MCPs**, mescle a configuração ao objeto `mcpServers` existente:
+
+```json
+{
+  "mcpServers": {
+    "gitlab": { ... },
+    "youtrack": {
+      "type": "http",
+      "url": "https://empresa.youtrack.cloud/mcp",
+      "headers": {
+        "Authorization": "Bearer perm:XXXXX.XXXXX.XXXXXXXXXXXXX"
+      }
+    }
+  }
+}
+```
+
+#### Opção B: Configuração Por Projeto
+
+Edite o arquivo `~/.claude.json` e adicione a configuração na seção `projects`:
 
 ```json
 {
@@ -60,18 +101,14 @@ Edite o arquivo `~/.claude.json` e adicione a configuração do YouTrack dentro 
 }
 ```
 
-**Exemplo real:**
-```json
-"youtrack": {
-  "type": "http",
-  "url": "https://empresa.youtrack.cloud/mcp",
-  "headers": {
-    "Authorization": "Bearer perm:Y2xhdWRl.NTktMjE=.XXXXXXXXXXXXX"
-  }
-}
-```
+### 4. Resumo dos locais de configuração
 
-### 4. Parâmetros opcionais
+| Arquivo | Escopo | Quando usar |
+|---------|--------|-------------|
+| `~/.claude/settings.json` | **Global** | Usar o mesmo YouTrack em todos os projetos |
+| `~/.claude.json` (seção projects) | Por projeto | YouTracks diferentes por projeto |
+
+### 5. Parâmetros opcionais
 
 É possível personalizar as ferramentas disponíveis adicionando query parameters à URL:
 
@@ -92,7 +129,7 @@ Edite o arquivo `~/.claude.json` e adicione a configuração do YouTrack dentro 
 }
 ```
 
-### 5. Finalização
+### 6. Finalização
 
 Informe ao usuário:
 
@@ -100,7 +137,7 @@ Informe ao usuário:
 2. Executar `/mcp` para verificar se está conectado
 3. As ferramentas do YouTrack estarão disponíveis imediatamente
 
-### 6. Ferramentas disponíveis
+### 7. Ferramentas disponíveis
 
 Após configurado, o usuário terá acesso a ferramentas como:
 
@@ -132,13 +169,13 @@ Fatal error: TypeError: Invalid URL
   input: '/hub'
 ```
 
-**Solução**: Use o método HTTP transport direto (configuração manual no `.claude.json`) em vez de `mcp-remote`.
+**Solução**: Use o método HTTP transport direto (configuração manual no `settings.json` ou `.claude.json`) em vez de `mcp-remote`.
 
 ### Headers não salvos pelo `claude mcp add`
 
 O comando `claude mcp add --header` não salva os headers para HTTP transport.
 
-**Solução**: Edite manualmente o arquivo `~/.claude.json` e adicione a propriedade `headers` conforme o passo 3.
+**Solução**: Edite manualmente o arquivo de configuração (`~/.claude/settings.json` para global ou `~/.claude.json` para por projeto) e adicione a propriedade `headers` conforme o passo 3.
 
 ### Erro "401 Unauthorized"
 - Verifique se o token está correto
