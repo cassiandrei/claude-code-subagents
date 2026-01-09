@@ -16,3 +16,10 @@ stats-cache.json
 
 # Downloads temporários
 downloads/
+
+# Cache temporário
+cache/
+paste-cache/
+
+# Configurações com tokens sensíveis
+settings.json
