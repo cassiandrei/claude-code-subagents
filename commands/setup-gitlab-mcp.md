@@ -27,8 +27,8 @@ Se não estiver instalado, instrua o usuário a instalar via:
 Pergunte ao usuário:
 
 1. **Escopo da configuração:**
-   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude/settings.json`)
-   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção projects)
+   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude.json` seção `mcpServers` raiz)
+   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção `projects`)
 
 2. **Qual GitLab você usa?**
    - GitLab.com (https://gitlab.com)
@@ -63,7 +63,9 @@ O token terá o formato: `glpat-XXXXXXXXXXXXXXXXXXXX`
 
 #### Opção A: Configuração Global (Recomendado)
 
-Edite o arquivo `~/.claude/settings.json` e adicione a configuração do GitLab.
+**IMPORTANTE**: O arquivo correto para configuração global é `~/.claude.json`, NÃO `~/.claude/settings.json`.
+
+Edite o arquivo `~/.claude.json` e adicione/atualize a seção `mcpServers` no **nível raiz** do JSON (não dentro de `projects`).
 
 **Para GitLab.com:**
 ```json
@@ -105,7 +107,13 @@ Edite o arquivo `~/.claude/settings.json` e adicione a configuração do GitLab.
 }
 ```
 
-**Se já existir um `settings.json`**, mescle a configuração ao objeto `mcpServers` existente.
+**Se já existir `mcpServers` no arquivo**, mescle a nova configuração ao objeto existente.
+
+**Alternativa via CLI** (adiciona servidor, mas precisa editar env manualmente):
+```bash
+claude mcp add gitlab-syntesis -s user -- npx -y @zereight/mcp-gitlab
+```
+Depois edite `~/.claude.json` para adicionar as variáveis de ambiente no objeto `env`.
 
 #### Opção B: Configuração Por Projeto
 
@@ -138,9 +146,11 @@ Edite o arquivo `~/.claude.json` e adicione a configuração na seção `project
 
 | Arquivo | Escopo | Quando usar |
 |---------|--------|-------------|
-| `~/.claude/settings.json` | **Global** | Usar o mesmo GitLab em todos os projetos |
-| `~/.claude.json` (seção projects) | Por projeto | GitLabs diferentes por projeto |
+| `~/.claude.json` (seção `mcpServers` raiz) | **Global** | Usar o mesmo GitLab em todos os projetos |
+| `~/.claude.json` (seção `projects`) | Por projeto | GitLabs diferentes por projeto |
 | `.mcp.json` na raiz do projeto | Por projeto | Compartilhar config via git (sem tokens!)
+
+**ATENÇÃO**: `~/.claude/settings.json` NÃO é lido pelo Claude Code para MCPs. Use sempre `~/.claude.json`.
 
 ### 6. Variáveis de ambiente opcionais
 
@@ -200,7 +210,8 @@ Após configurado, o usuário terá acesso a **95+ ferramentas**, incluindo:
 
 ### MCP não aparece no `/mcp`
 - Reinicie o Claude Code completamente
-- Verifique se o `settings.json` está no path correto (`~/.claude/settings.json`)
+- Verifique se a configuração está em `~/.claude.json` (NÃO em `~/.claude/settings.json`)
+- Verifique se `mcpServers` está no nível raiz do JSON, não dentro de `projects`
 - Verifique se o JSON está válido (sem erros de sintaxe)
 - Execute `claude mcp list` para verificar se foi carregado
 

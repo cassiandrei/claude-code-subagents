@@ -15,8 +15,8 @@ Execute os seguintes passos para configurar o YouTrack MCP:
 Pergunte ao usuário:
 
 1. **Escopo da configuração:**
-   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude/settings.json`)
-   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção projects)
+   - **Global** (recomendado) - Disponível em todos os projetos (`~/.claude.json` seção `mcpServers` raiz)
+   - **Por projeto** - Apenas no projeto atual (`~/.claude.json` seção `projects`)
 
 2. **Qual é a URL base do YouTrack?**
    - YouTrack Cloud (ex: https://empresa.youtrack.cloud)
@@ -46,7 +46,9 @@ O token terá o formato: `perm:XXXXXXXX.XX-XX.XXXXXXXXXXXXXXXXXXXX`
 
 #### Opção A: Configuração Global (Recomendado)
 
-Edite o arquivo `~/.claude/settings.json` e adicione a configuração do YouTrack:
+**IMPORTANTE**: O arquivo correto para configuração global é `~/.claude.json`, NÃO `~/.claude/settings.json`.
+
+Edite o arquivo `~/.claude.json` e adicione/atualize a seção `mcpServers` no **nível raiz** do JSON (não dentro de `projects`).
 
 ```json
 {
@@ -62,7 +64,7 @@ Edite o arquivo `~/.claude/settings.json` e adicione a configuração do YouTrac
 }
 ```
 
-**Se já existir um `settings.json` com outros MCPs**, mescle a configuração ao objeto `mcpServers` existente:
+**Se já existir `mcpServers` com outros MCPs**, mescle a configuração ao objeto existente:
 
 ```json
 {
@@ -105,8 +107,10 @@ Edite o arquivo `~/.claude.json` e adicione a configuração na seção `project
 
 | Arquivo | Escopo | Quando usar |
 |---------|--------|-------------|
-| `~/.claude/settings.json` | **Global** | Usar o mesmo YouTrack em todos os projetos |
-| `~/.claude.json` (seção projects) | Por projeto | YouTracks diferentes por projeto |
+| `~/.claude.json` (seção `mcpServers` raiz) | **Global** | Usar o mesmo YouTrack em todos os projetos |
+| `~/.claude.json` (seção `projects`) | Por projeto | YouTracks diferentes por projeto |
+
+**ATENÇÃO**: `~/.claude/settings.json` NÃO é lido pelo Claude Code para MCPs. Use sempre `~/.claude.json`.
 
 ### 5. Parâmetros opcionais
 
@@ -169,13 +173,13 @@ Fatal error: TypeError: Invalid URL
   input: '/hub'
 ```
 
-**Solução**: Use o método HTTP transport direto (configuração manual no `settings.json` ou `.claude.json`) em vez de `mcp-remote`.
+**Solução**: Use o método HTTP transport direto (configuração manual no `~/.claude.json`) em vez de `mcp-remote`.
 
 ### Headers não salvos pelo `claude mcp add`
 
 O comando `claude mcp add --header` não salva os headers para HTTP transport.
 
-**Solução**: Edite manualmente o arquivo de configuração (`~/.claude/settings.json` para global ou `~/.claude.json` para por projeto) e adicione a propriedade `headers` conforme o passo 3.
+**Solução**: Edite manualmente o arquivo `~/.claude.json` e adicione a propriedade `headers` conforme o passo 3. Para global, use a seção `mcpServers` raiz; para por projeto, use a seção `projects`.
 
 ### Erro "401 Unauthorized"
 - Verifique se o token está correto
@@ -193,6 +197,8 @@ O comando `claude mcp add --header` não salva os headers para HTTP transport.
 
 ### MCP não aparece no `/mcp`
 - Reinicie o Claude Code completamente
+- Verifique se a configuração está em `~/.claude.json` (NÃO em `~/.claude/settings.json`)
+- Verifique se `mcpServers` está no nível raiz do JSON, não dentro de `projects`
 - Verifique a configuração com `claude mcp list`
 - Para remover e reconfigurar: `claude mcp remove youtrack`
 
