@@ -3,6 +3,8 @@ description: Cria vídeo de validação de User Story com legendas explicativas
 allowed-tools: mcp__youtrack__*, mcp__gitlab__*, Bash, Read, Write, Edit, Glob, Grep, AskUserQuestion, Task
 ---
 
+**IMPORTANTE:** Antes de executar, carregue a skill `gv-youtrack` para entender o workflow do YouTrack no Grupo Voalle.
+
 # Validação de User Story
 
 Cria um vídeo de validação E2E para demonstrar as funcionalidades implementadas em uma User Story.

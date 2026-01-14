@@ -3,6 +3,8 @@ description: Lista itens em revisão no YouTrack
 allowed-tools: mcp__youtrack__search_issues, mcp__youtrack__get_issue, mcp__youtrack__find_projects
 ---
 
+**IMPORTANTE:** Antes de executar, carregue a skill `gv-youtrack` para entender o workflow do YouTrack no Grupo Voalle.
+
 # Listar Itens em Revisão - YouTrack
 
 Lista todos os cards em revisão de um projeto no YouTrack.

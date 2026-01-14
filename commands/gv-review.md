@@ -3,6 +3,8 @@ description: Review completo de User Story (YouTrack) e Merge Request (GitLab)
 allowed-tools: mcp__youtrack__*, mcp__gitlab__*, Bash, Read, Grep, Glob, AskUserQuestion
 ---
 
+**IMPORTANTE:** Antes de executar, carregue a skill `gv-youtrack` para entender o workflow do YouTrack no Grupo Voalle.
+
 # Review Completo - US + MR
 
 Realiza um review completo que analisa tanto a User Story no YouTrack quanto o Merge Request no GitLab, verificando se a implementação atende aos requisitos.
