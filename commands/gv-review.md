@@ -19,7 +19,7 @@ Realiza um review completo que analisa tanto a User Story no YouTrack quanto o M
 
 Analisar `$ARGUMENTS`:
 - Se começa com letras e contém hífen (ex: `ORN-1148`): É um ID do YouTrack
-- Se começa com `!` ou é apenas número (ex: `!104`, `104`): É um MR do GitLab
+- Se começa com exclamação ou é apenas número, como 104 ou !104: É um MR do GitLab
 - Se vazio: Extrair ID da branch atual (ex: `41-epic-fundacao...` → `41`, `orn-1148-feature` → `ORN-1148`)
 - Se não estiver commitado ou sincronizado com o remoto, fazer code-review do que ainda não está no remoto. (Pergunte para o usuário se a review é exclusivo do código não sincronizado)
 
