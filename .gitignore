@@ -13,6 +13,7 @@ todos/
 # Arquivos gerados
 history.jsonl
 stats-cache.json
+.credentials.json
 
 # Downloads temporários
 downloads/
