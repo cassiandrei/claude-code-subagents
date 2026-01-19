@@ -81,6 +81,23 @@ In Progress-Review → Waiting for Validation  # ✅ Depois
 
 Ao atualizar status ou concluir trabalho, **sempre registre o tempo gasto**.
 
+### Registro obrigatório antes de sair
+
+O workflow **bloqueia** a saída dos seguintes status se não houver tempo registrado:
+
+| Status | Requer tempo para sair |
+|--------|------------------------|
+| In Progress DEV | ✅ Sim |
+| In Progress-Review | ✅ Sim |
+| Waiting for Validation | ✅ Sim |
+
+**Mensagem de erro típica:**
+```
+❌ É necessário registrar tempo antes de mover para "Waiting for Validation".
+```
+
+**Solução:** Registre o tempo de trabalho com `log_work` antes de atualizar o status.
+
 ### Tipos de trabalho disponíveis
 
 - Testing
