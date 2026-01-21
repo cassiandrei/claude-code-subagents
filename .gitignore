@@ -24,3 +24,4 @@ paste-cache/
 
 # Configurações com tokens sensíveis
 settings.json
+settings.local.json
