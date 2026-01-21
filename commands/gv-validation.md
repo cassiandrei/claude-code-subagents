@@ -137,28 +137,115 @@ async function hideSubtitle(page: any) {
   });
 }
 
+/**
+ * Mostra a URL atual em um banner no topo da página (simula barra de endereço do navegador)
+ * SEMPRE usar após cada page.goto() para mostrar a URL no vídeo
+ */
+async function showUrlBar(page: any, url: string) {
+  await page.evaluate((currentUrl: string) => {
+    const existing = document.getElementById('qa-url-bar');
+    if (existing) existing.remove();
+
+    const urlBar = document.createElement('div');
+    urlBar.id = 'qa-url-bar';
+    urlBar.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #f1f3f4;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 16px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    `;
+
+    const lockIcon = currentUrl.startsWith('https') ? '🔒' : '⚠️';
+    const urlObj = new URL(currentUrl);
+    const domain = urlObj.host;
+    const path = urlObj.pathname + urlObj.search;
+
+    urlBar.innerHTML = `
+      <span style="font-size: 16px;">${lockIcon}</span>
+      <div style="
+        flex: 1;
+        background: white;
+        border-radius: 20px;
+        padding: 6px 16px;
+        border: 1px solid #ddd;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      ">
+        <span style="color: #202124; font-weight: 500;">${domain}</span><span style="color: #5f6368;">${path.length > 60 ? path.substring(0, 60) + '...' : path}</span>
+      </div>
+    `;
+
+    document.body.appendChild(urlBar);
+    document.body.style.paddingTop = '50px';
+  }, url);
+}
+
+async function hideUrlBar(page: any) {
+  await page.evaluate(() => {
+    const urlBar = document.getElementById('qa-url-bar');
+    if (urlBar) urlBar.remove();
+    document.body.style.paddingTop = '';
+  });
+}
+
 const PAUSE_DURATION = 3000;
 
 // Adaptar imports e estrutura conforme skill de QA do projeto
 test.describe('{ID} - Validação: {Summary}', () => {
   test('Vídeo de validação completo', async ({ page }) => {
-    // INTRODUÇÃO
-    await page.goto('{AMBIENTE_URL}');
-    await showSubtitle(page, '{ID}: Validação - {Summary}', 4000);
+    // INTRODUÇÃO (tela inicial sem URL bar)
+    await page.goto('about:blank');
+    await page.setContent(`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;font-family:system-ui;">
+        <h1 style="font-size:48px;">US {ID}</h1>
+        <h2 style="font-size:28px;font-weight:normal;opacity:0.9;">{Summary}</h2>
+        <p style="font-size:18px;opacity:0.7;margin-top:32px;">Validação QA</p>
+      </div>
+    `);
+    await page.waitForTimeout(4000);
 
     // ========================================
     // CENÁRIOS DE TESTE
-    // Gerar com base em:
+    // IMPORTANTE: Após cada page.goto(), SEMPRE chamar:
+    //   await showUrlBar(page, url);
+    // Isso mostra a URL no topo da página (simula barra do navegador)
+    //
+    // Gerar cenários com base em:
     // 1. Description da US
     // 2. Código do Merge Request
     // 3. Arquivos modificados
     // ========================================
 
-    // CONCLUSÃO
-    await showSubtitle(page, 'Validação concluída com sucesso!', PAUSE_DURATION);
-    await showSubtitle(page, '{ID}: Todas as funcionalidades estão funcionando.', 4000);
+    // Exemplo de navegação com URL bar:
+    // const testUrl = `${baseUrl}/minha-rota?param=valor`;
+    // await page.goto(testUrl, { waitUntil: 'networkidle' });
+    // await showUrlBar(page, testUrl);  // <-- SEMPRE incluir!
+    // await showSubtitle(page, 'Verificando funcionalidade X...');
+
+    // CONCLUSÃO (remover URL bar antes da tela final)
     await hideSubtitle(page);
-    await page.waitForTimeout(2000);
+    await hideUrlBar(page);
+    await page.setContent(`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#11998e 0%,#38ef7d 100%);color:white;font-family:system-ui;text-align:center;">
+        <h1 style="font-size:48px;">✅ Validação Concluída</h1>
+        <div style="font-size:24px;line-height:1.8;">
+          <p>✓ Funcionalidade 1 OK</p>
+          <p>✓ Funcionalidade 2 OK</p>
+        </div>
+        <p style="font-size:16px;opacity:0.7;margin-top:48px;">US {ID} - Validado com sucesso</p>
+      </div>
+    `);
+    await page.waitForTimeout(5000);
   });
 });
 ```
@@ -171,6 +258,12 @@ Analisar a description da US E o código do MR para criar cenários precisos:
 - Legendas devem explicar o que está sendo testado
 - Usar URLs e dados reais quando possível
 - Cobrir casos de sucesso e edge cases identificados no código
+
+**IMPORTANTE - Barra de URL:**
+- SEMPRE chamar `showUrlBar(page, url)` após cada `page.goto()`
+- Isso mostra uma barra de endereço simulada no topo da página
+- A URL fica visível no vídeo, facilitando a compreensão do QA
+- Antes da tela de conclusão, chamar `hideUrlBar(page)` para limpar
 
 ### 7. Executar teste e gravar vídeo
 
