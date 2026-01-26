@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Órion - {{SPRINT_NAME}}</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            --border-color: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+            --accent-orange: #db6d28;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1::before {
+            content: "🚀";
+        }
+
+        .header-meta {
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .project-badge {
+            background: var(--accent-purple);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .summary-card .value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .summary-card.total .value { color: var(--accent-blue); }
+        .summary-card.backlog .value { color: var(--text-secondary); }
+        .summary-card.progress .value { color: var(--accent-yellow); }
+        .summary-card.done .value { color: var(--accent-green); }
+
+        /* Progress Bar */
+        .progress-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .progress-percent {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .tab.active {
+            background: var(--bg-tertiary);
+            color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Kanban */
+        .kanban {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .kanban-column {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 400px;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .column-title {
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .column-title::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .column-backlog .column-title::before { background: var(--text-secondary); }
+        .column-progress .column-title::before { background: var(--accent-yellow); }
+        .column-waiting .column-title::before { background: var(--accent-orange); }
+        .column-done .column-title::before { background: var(--accent-green); }
+
+        .column-count {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        .column-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Issue Cards */
+        .issue-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .issue-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .issue-id {
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .issue-type {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .type-epic { background: var(--accent-purple); color: white; }
+        .type-user-story, .type-userstory { background: var(--accent-blue); color: white; }
+        .type-task { background: var(--accent-green); color: white; }
+        .type-bug { background: var(--accent-red); color: white; }
+        .type-incident { background: var(--accent-orange); color: white; }
+
+        .issue-title {
+            font-size: 13px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .issue-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .issue-assignee {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .issue-assignee::before {
+            content: "👤";
+            font-size: 10px;
+        }
+
+        .issue-updated::before {
+            content: "🕐";
+            font-size: 10px;
+            margin-right: 4px;
+        }
+
+        /* New Incidents Section */
+        .new-incidents-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .new-incidents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .new-incidents-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-orange);
+        }
+
+        .new-incidents-header h2::before {
+            content: "🆕";
+        }
+
+        .new-incidents-count {
+            background: var(--accent-orange);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .new-incidents-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 12px;
+        }
+
+        .new-incident-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-orange);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .new-incident-item:hover {
+            transform: translateX(4px);
+            background: var(--bg-secondary);
+        }
+
+        .new-incident-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .new-incident-item-title {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .new-incident-item-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .no-new-incidents {
+            text-align: center;
+            padding: 20px;
+            color: var(--accent-green);
+            font-size: 14px;
+        }
+
+        .no-new-incidents::before {
+            content: "✅ ";
+        }
+
+        /* Alerts */
+        .alerts-section {
+            margin-top: 32px;
+        }
+
+        .alerts-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alerts-title::before {
+            content: "⚠️";
+        }
+
+        .alerts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 16px;
+        }
+
+        .alert-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .alert-card.warning {
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        .alert-card.danger {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .alert-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .alert-item .issue-id {
+            min-width: 80px;
+        }
+
+        .no-alerts {
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .no-alerts::before {
+            content: "✅";
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state::before {
+            content: "📭";
+            font-size: 48px;
+            display: block;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kanban {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kanban {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .header-meta {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>
+                {{SPRINT_NAME}}
+                <span class="project-badge">ORN</span>
+            </h1>
+            <div class="header-meta">
+                <div>Atualizado em: {{GENERATED_AT}}</div>
+                <div>Projeto: EV Orion</div>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card total">
+                <div class="value">{{TOTAL_ISSUES}}</div>
+                <div class="label">Total de Issues</div>
+            </div>
+            <div class="summary-card backlog">
+                <div class="value">{{BACKLOG_COUNT}}</div>
+                <div class="label">Backlog</div>
+            </div>
+            <div class="summary-card progress">
+                <div class="value">{{PROGRESS_COUNT}}</div>
+                <div class="label">Em Progresso</div>
+            </div>
+            <div class="summary-card done">
+                <div class="value">{{DONE_COUNT}}</div>
+                <div class="label">Concluídas</div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <h2>Progresso da Sprint</h2>
+                <span class="progress-percent">{{PROGRESS_PERCENT}}%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{PROGRESS_PERCENT}}%"></div>
+            </div>
+        </div>
+
+        <!-- New Incidents Section -->
+        <div class="new-incidents-section">
+            <div class="new-incidents-header">
+                <h2>Novos Incidentes / Apoios Técnicos</h2>
+                <span class="new-incidents-count">{{NEW_INCIDENTS_COUNT}}</span>
+            </div>
+            <div class="new-incidents-list">
+                {{NEW_INCIDENTS_CARDS}}
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('kanban')">📋 Kanban</button>
+            <button class="tab" onclick="showTab('alerts')">⚠️ Alertas</button>
+        </div>
+
+        <!-- Kanban View -->
+        <div id="tab-kanban" class="tab-content active">
+            <div class="kanban">
+                <div class="kanban-column column-backlog">
+                    <div class="column-header">
+                        <span class="column-title">Backlog</span>
+                        <span class="column-count">{{BACKLOG_COUNT}}</span>
+                    </div>
+                    <div class="column-cards">
+                        {{BACKLOG_CARDS}}
+                    </div>
+                </div>
+                <div class="kanban-column column-progress">
+                    <div class="column-header">
+                        <span class="column-title">Em Progresso</span>
+                        <span class="column-count">{{PROGRESS_COUNT}}</span>
+                    </div>
+                    <div class="column-cards">
+                        {{PROGRESS_CARDS}}
+                    </div>
+                </div>
+                <div class="kanban-column column-waiting">
+                    <div class="column-header">
+                        <span class="column-title">Aguardando</span>
+                        <span class="column-count">{{WAITING_COUNT}}</span>
+                    </div>
+                    <div class="column-cards">
+                        {{WAITING_CARDS}}
+                    </div>
+                </div>
+                <div class="kanban-column column-done">
+                    <div class="column-header">
+                        <span class="column-title">Concluídas</span>
+                        <span class="column-count">{{DONE_COUNT}}</span>
+                    </div>
+                    <div class="column-cards">
+                        {{DONE_CARDS}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts View -->
+        <div id="tab-alerts" class="tab-content">
+            <div class="alerts-section">
+                <h2 class="alerts-title">Alertas da Sprint</h2>
+                {{ALERTS_SECTION}}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById('tab-' + tabId).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Make issue cards clickable
+        document.querySelectorAll('.issue-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const issueId = this.querySelector('.issue-id').textContent;
+                window.open(`https://grupovoalle.youtrack.cloud/issue/${issueId}`, '_blank');
+            });
+        });
+    </script>
+</body>
+</html>

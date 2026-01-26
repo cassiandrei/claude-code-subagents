@@ -9,6 +9,8 @@ session-env/
 shell-snapshots/
 statsig/
 todos/
+tasks/
+telemetry/
 
 # Arquivos gerados
 history.jsonl
@@ -25,3 +27,4 @@ paste-cache/
 # Configurações com tokens sensíveis
 settings.json
 settings.local.json
+
