@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprint Planning - {{SPRINT_NAME}}</title>
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --bg-card: #161b22;
+            --bg-hover: #21262d;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-yellow: #d29922;
+            --accent-red: #f85149;
+            --accent-purple: #a371f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #2ea043;
+        }
+
+        .btn-danger {
+            background: transparent;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(248, 81, 73, 0.1);
+        }
+
+        /* Capacity Bar */
+        .capacity-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .capacity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .capacity-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .capacity-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .capacity-value.warning {
+            color: var(--accent-yellow);
+        }
+
+        .capacity-value.danger {
+            color: var(--accent-red);
+        }
+
+        .capacity-bar {
+            height: 24px;
+            background: var(--bg-hover);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .capacity-fill {
+            height: 100%;
+            background: var(--accent-green);
+            border-radius: 12px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .capacity-fill.warning {
+            background: var(--accent-yellow);
+        }
+
+        .capacity-fill.danger {
+            background: var(--accent-red);
+        }
+
+        .capacity-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .column {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-hover);
+        }
+
+        .column-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .column-count {
+            background: var(--bg-dark);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .column-content {
+            padding: 16px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-tab {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-hover);
+        }
+
+        .filter-tab.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        /* Issue Cards */
+        .issue-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .issue-card:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .issue-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .issue-id {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .issue-id:hover {
+            text-decoration: underline;
+        }
+
+        .issue-type {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        .type-epic { background: var(--accent-purple); color: #fff; }
+        .type-user-story { background: var(--accent-blue); color: #fff; }
+        .type-incident { background: var(--accent-red); color: #fff; }
+        .type-tech-story { background: var(--accent-yellow); color: #000; }
+        .type-automation { background: #6e7681; color: #fff; }
+        .type-quality-assurance { background: #388bfd; color: #fff; }
+
+        .issue-title {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .issue-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .issue-status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--bg-hover);
+        }
+
+        .issue-weight {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .weight-badge {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .weight-badge:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .weight-badge.suggested {
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .weight-badge.edited {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .issue-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .issue-actions .btn {
+            flex: 1;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Changes Section */
+        .changes-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .changes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .changes-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .changes-count {
+            background: var(--accent-yellow);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .changes-list {
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .change-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .change-item:last-child {
+            border-bottom: none;
+        }
+
+        .change-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .change-icon.add { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+        .change-icon.remove { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+        .change-icon.edit { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); }
+
+        .change-undo {
+            margin-left: auto;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .change-undo:hover {
+            color: var(--accent-red);
+        }
+
+        .changes-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            background: var(--bg-hover);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        /* Weight Edit Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 24px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .weight-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .weight-option {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .weight-option:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .weight-option.selected {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .weight-option .number {
+            font-size: 20px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .weight-option .label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 4px;
+        }
+
+        .weight-option.selected .label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .modal-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Output Modal */
+        .output-content {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-color: var(--accent-green);
+        }
+
+        .toast.error {
+            border-color: var(--accent-red);
+        }
+
+        /* Generated info */
+        .generated-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Search/Filter */
+        .search-box {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* Weight Legend */
+        .weight-legend {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .legend-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            font-size: 11px;
+            color: var(--text-secondary);
+            background: var(--bg-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .legend-item strong {
+            color: var(--accent-blue);
+        }
+
+        /* Objetivo Section */
+        .objetivo-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .objetivo-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .objetivo-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+        }
+
+        .objetivo-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .objetivo-textarea::placeholder {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <span>Sprint Planning</span>
+                <span style="color: var(--accent-blue)">{{SPRINT_NAME}}</span>
+            </h1>
+            <div class="header-actions">
+                <span class="generated-info">Gerado em: {{GENERATED_AT}}</span>
+                <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+            </div>
+        </header>
+
+        <!-- Weight Legend -->
+        <div class="weight-legend">
+            <span class="legend-title">Peso (horas Senior):</span>
+            <span class="legend-item"><strong>1</strong>=1h</span>
+            <span class="legend-item"><strong>2</strong>=2h</span>
+            <span class="legend-item"><strong>3</strong>=3h</span>
+            <span class="legend-item"><strong>4</strong>=5h</span>
+            <span class="legend-item"><strong>5</strong>=8h</span>
+            <span class="legend-item"><strong>6</strong>=13h</span>
+            <span class="legend-item"><strong>7</strong>=21h</span>
+            <span class="legend-item"><strong>8</strong>=34h</span>
+            <span class="legend-item"><strong>9</strong>=55h</span>
+            <span class="legend-item"><strong>10</strong>=89h</span>
+        </div>
+
+        <!-- Capacity Section -->
+        <div class="capacity-section">
+            <div class="capacity-header">
+                <div class="capacity-title">Capacidade da Sprint</div>
+                <div class="capacity-value" id="capacity-display">
+                    <span id="used-capacity">0</span> / <input type="number" id="total-capacity" value="{{TOTAL_CAPACITY}}" min="1" max="200" style="width: 60px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); font-size: 24px; font-weight: 700; text-align: center; padding: 2px;" onchange="updateTotalCapacity(this.value)"> pontos
+                </div>
+            </div>
+            <div class="capacity-bar">
+                <div class="capacity-fill" id="capacity-fill" style="width: 0%"></div>
+            </div>
+            <div class="capacity-labels">
+                <span>0%</span>
+                <span id="capacity-percent">0%</span>
+                <span>100%</span>
+            </div>
+        </div>
+
+        <!-- Objetivo -->
+        <div class="objetivo-section">
+            <label class="objetivo-label">Objetivo da Sprint</label>
+            <textarea id="sprint-objetivo" class="objetivo-textarea" placeholder="Descreva o objetivo principal da sprint, metas, prioridades..."></textarea>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Sprint Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">Sprint Atual (Em Andamento)</span>
+                    <span class="column-count" id="sprint-count">0</span>
+                </div>
+                <div class="filter-tabs" id="sprint-filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="Incident">Incident</button>
+                    <button class="filter-tab" data-filter="Technical Support">Tech Support</button>
+                    <button class="filter-tab" data-filter="User Story">User Story</button>
+                    <button class="filter-tab" data-filter="Tech Story">Tech Story</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Buscar issues..." id="sprint-search-input">
+                </div>
+                <div class="column-content" id="sprint-issues">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>Carregando...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Backlog Column -->
+            <div class="column">
+                <div class="column-header">
+                    <span class="column-title">Backlog Disponivel</span>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="btn" onclick="openNewCardModal()" style="padding: 4px 12px; font-size: 12px;">+ Novo Card</button>
+                        <span class="column-count" id="backlog-count">0</span>
+                    </div>
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Todos</button>
+                    <button class="filter-tab" data-filter="Incident">Incident</button>
+                    <button class="filter-tab" data-filter="Technical Support">Tech Support</button>
+                    <button class="filter-tab" data-filter="User Story">User Story</button>
+                    <button class="filter-tab" data-filter="Tech Story">Tech Story</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Buscar issues..." id="search-input">
+                </div>
+                <div class="column-content" id="backlog-issues">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Changes Section -->
+        <div class="changes-section" id="changes-section" style="display: none;">
+            <div class="changes-header">
+                <span class="changes-title">Alteracoes Pendentes</span>
+                <span class="changes-count" id="changes-count">0</span>
+            </div>
+            <div class="changes-list" id="changes-list">
+            </div>
+            <div class="changes-actions">
+                <button class="btn btn-danger" onclick="clearChanges()">Cancelar Alteracoes</button>
+                <button class="btn btn-primary" onclick="showApplyModal()">Gerar Comandos YouTrack</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Edit Modal -->
+    <div class="modal-overlay" id="weight-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">Editar Peso</span>
+                <span class="modal-close" onclick="closeWeightModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 13px;">
+                    Issue: <strong id="modal-issue-id"></strong>
+                </p>
+                <div class="weight-selector" id="weight-selector">
+                    <div class="weight-option" data-weight="1"><span class="number">1</span><span class="label">Trivial</span></div>
+                    <div class="weight-option" data-weight="2"><span class="number">2</span><span class="label">Simples</span></div>
+                    <div class="weight-option" data-weight="3"><span class="number">3</span><span class="label">Pequeno</span></div>
+                    <div class="weight-option" data-weight="4"><span class="number">4</span><span class="label">Medio-</span></div>
+                    <div class="weight-option" data-weight="5"><span class="number">5</span><span class="label">Medio</span></div>
+                    <div class="weight-option" data-weight="6"><span class="number">6</span><span class="label">Medio+</span></div>
+                    <div class="weight-option" data-weight="7"><span class="number">7</span><span class="label">Grande</span></div>
+                    <div class="weight-option" data-weight="8"><span class="number">8</span><span class="label">Complexo</span></div>
+                    <div class="weight-option" data-weight="9"><span class="number">9</span><span class="label">Muito Grande</span></div>
+                    <div class="weight-option" data-weight="10"><span class="number">10</span><span class="label">Epico</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeWeightModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveWeight()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Apply Modal -->
+    <div class="modal-overlay" id="apply-modal">
+        <div class="modal" style="width: 600px;">
+            <div class="modal-header">
+                <span class="modal-title">Comandos para YouTrack</span>
+                <span class="modal-close" onclick="closeApplyModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 13px;">
+                    Copie o JSON abaixo e envie para o Claude aplicar as alteracoes no YouTrack:
+                </p>
+                <div class="output-content" id="apply-output"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeApplyModal()">Fechar</button>
+                <button class="btn btn-primary" onclick="copyToClipboard()">Copiar JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Card Modal -->
+    <div class="modal-overlay" id="new-card-modal">
+        <div class="modal" style="width: 500px;">
+            <div class="modal-header">
+                <span class="modal-title">Novo Card</span>
+                <span class="modal-close" onclick="closeNewCardModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary);">Titulo *</label>
+                    <input type="text" id="new-card-summary" class="search-input" style="width: 100%;" placeholder="Descricao do card">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary);">Tipo *</label>
+                        <select id="new-card-type" style="width: 100%; padding: 8px 12px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                            <option value="Incident">Incident</option>
+                            <option value="Technical Support">Technical Support</option>
+                            <option value="User Story">User Story</option>
+                            <option value="Tech Story">Tech Story</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary);">Peso</label>
+                        <select id="new-card-weight" style="width: 100%; padding: 8px 12px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                            <option value="">Sem peso</option>
+                            <option value="1">1 - Trivial</option>
+                            <option value="2">2 - Simples</option>
+                            <option value="3">3 - Pequeno</option>
+                            <option value="4">4 - Medio-</option>
+                            <option value="5">5 - Medio</option>
+                            <option value="6">6 - Medio+</option>
+                            <option value="7">7 - Grande</option>
+                            <option value="8">8 - Complexo</option>
+                            <option value="9">9 - Muito Grande</option>
+                            <option value="10">10 - Epico</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary);">Data Repactuada</label>
+                    <input type="date" id="new-card-date" style="width: 100%; padding: 8px 12px; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; color: var(--text-primary); font-size: 13px;">
+                </div>
+                <div>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" id="new-card-priority" style="width: 16px; height: 16px;">
+                        <span>Tag Prioridade</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeNewCardModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="createNewCard()">Criar Card</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        // Ordem de prioridade por Type (classe de servico)
+        const typePriority = {
+            'Incident': 1,
+            'User Story': 2,
+            'Tech Story': 3,
+            'Automation': 4,
+            'Quality Assurance': 5
+        };
+
+        // Funcao para converter data DD/MM/YYYY para Date
+        function parseDate(dateStr) {
+            if (!dateStr) return new Date('2099-12-31'); // Sem data vai pro final
+            const [day, month, year] = dateStr.split('/');
+            return new Date(year, month - 1, day);
+        }
+
+        // Verifica se a data esta vencida
+        function isOverdue(dateStr) {
+            if (!dateStr) return false;
+            const date = parseDate(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date < today;
+        }
+
+        // Funcao de ordenacao: Tag Prioridade + Classe Servico (Type) + Data Repactuada ASC
+        function sortIssues(issues) {
+            return issues.sort((a, b) => {
+                // Primeiro: Tag Prioridade (issues com tag vem primeiro)
+                const hasPrioA = a.hasPrioridade ? 0 : 1;
+                const hasPrioB = b.hasPrioridade ? 0 : 1;
+                if (hasPrioA !== hasPrioB) return hasPrioA - hasPrioB;
+
+                // Segundo: ordenar por Type (classe de servico)
+                const priorityA = typePriority[a.type] || 99;
+                const priorityB = typePriority[b.type] || 99;
+                if (priorityA !== priorityB) return priorityA - priorityB;
+
+                // Terceiro: ordenar por Data Repactuada (ASC - mais antiga primeiro)
+                const dateA = parseDate(a.dataRepactuada);
+                const dateB = parseDate(b.dataRepactuada);
+                return dateA - dateB;
+            });
+        }
+
+        // Data from YouTrack
+        const sprintIssuesRaw = {{SPRINT_ISSUES}};
+        const backlogIssuesRaw = {{BACKLOG_ISSUES}};
+
+        // Aplicar ordenacao
+        const sprintIssues = sortIssues(sprintIssuesRaw);
+        const backlogIssues = sortIssues(backlogIssuesRaw);
+
+        let totalCapacity = {{TOTAL_CAPACITY}};
+
+        // State
+        let currentSprintIssues = JSON.parse(JSON.stringify(sprintIssues));
+        let currentBacklogIssues = JSON.parse(JSON.stringify(backlogIssues));
+        let changes = [];
+        let currentFilter = 'all';
+        let currentSprintFilter = 'all';
+        let editingIssueId = null;
+        let selectedWeight = null;
+
+        // LocalStorage key
+        const STORAGE_KEY = 'sprint-planning-state';
+
+        // Save state to localStorage
+        function saveState() {
+            const state = {
+                currentSprintIssues,
+                currentBacklogIssues,
+                changes,
+                totalCapacity,
+                currentFilter,
+                currentSprintFilter,
+                objetivo: document.getElementById('sprint-objetivo').value,
+                savedAt: new Date().toISOString()
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            console.log('Estado salvo:', new Date().toLocaleTimeString());
+        }
+
+        // Load state from localStorage
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    const savedDate = new Date(state.savedAt);
+                    const daysDiff = (new Date() - savedDate) / (1000 * 60 * 60 * 24);
+
+                    if (daysDiff < 7) {
+                        currentSprintIssues = state.currentSprintIssues || currentSprintIssues;
+                        currentBacklogIssues = state.currentBacklogIssues || currentBacklogIssues;
+                        changes = state.changes || [];
+                        totalCapacity = state.totalCapacity || 62;
+                        currentFilter = state.currentFilter || 'all';
+                        currentSprintFilter = state.currentSprintFilter || 'all';
+
+                        document.getElementById('total-capacity').value = totalCapacity;
+
+                        if (state.objetivo) {
+                            document.getElementById('sprint-objetivo').value = state.objetivo;
+                        }
+
+                        document.querySelectorAll('#sprint-filter-tabs .filter-tab').forEach(t => {
+                            t.classList.toggle('active', t.dataset.filter === currentSprintFilter);
+                        });
+                        document.querySelectorAll('.filter-tabs:not(#sprint-filter-tabs) .filter-tab').forEach(t => {
+                            t.classList.toggle('active', t.dataset.filter === currentFilter);
+                        });
+
+                        showToast(`Progresso restaurado (salvo ${savedDate.toLocaleString()})`, 'success');
+                        return true;
+                    }
+                } catch (e) {
+                    console.error('Erro ao carregar estado:', e);
+                }
+            }
+            return false;
+        }
+
+        // Clear saved state
+        function clearSavedState() {
+            localStorage.removeItem(STORAGE_KEY);
+            showToast('Estado limpo do localStorage', 'success');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderSprintIssues();
+            renderBacklogIssues();
+            updateCapacity();
+            renderChanges();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Sprint filter tabs
+            document.querySelectorAll('#sprint-filter-tabs .filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('#sprint-filter-tabs .filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentSprintFilter = tab.dataset.filter;
+                    renderSprintIssues();
+                });
+            });
+
+            // Backlog filter tabs
+            document.querySelectorAll('.filter-tabs:not(#sprint-filter-tabs) .filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tabs:not(#sprint-filter-tabs) .filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderBacklogIssues();
+                });
+            });
+
+            // Search
+            document.getElementById('search-input').addEventListener('input', renderBacklogIssues);
+            document.getElementById('sprint-search-input').addEventListener('input', renderSprintIssues);
+
+            // Objetivo - salvar ao digitar (com debounce)
+            let objetivoTimeout;
+            document.getElementById('sprint-objetivo').addEventListener('input', () => {
+                clearTimeout(objetivoTimeout);
+                objetivoTimeout = setTimeout(saveState, 500);
+            });
+
+            // Weight selector
+            document.querySelectorAll('.weight-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.weight-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedWeight = parseInt(opt.dataset.weight);
+                });
+            });
+        }
+
+        function renderSprintIssues() {
+            const container = document.getElementById('sprint-issues');
+            const searchTerm = document.getElementById('sprint-search-input').value.toLowerCase();
+
+            let filtered = currentSprintIssues.filter(issue => {
+                if (currentSprintFilter === 'all') {
+                    return true;
+                }
+                return issue.type === currentSprintFilter;
+            });
+
+            if (searchTerm) {
+                filtered = filtered.filter(issue =>
+                    issue.id.toLowerCase().includes(searchTerm) ||
+                    issue.summary.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            document.getElementById('sprint-count').textContent = `${filtered.length}/${currentSprintIssues.length}`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <p>${currentSprintFilter === 'all' ? 'Nenhuma issue na sprint' : 'Nenhuma issue deste tipo'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(issue => createIssueCard(issue, true)).join('');
+        }
+
+        function renderBacklogIssues() {
+            const container = document.getElementById('backlog-issues');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = currentBacklogIssues.filter(issue => {
+                if (currentFilter === 'all') {
+                    return true;
+                }
+                return issue.type === currentFilter;
+            });
+
+            if (searchTerm) {
+                filtered = filtered.filter(issue =>
+                    issue.id.toLowerCase().includes(searchTerm) ||
+                    issue.summary.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            document.getElementById('backlog-count').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📦</div>
+                        <p>Nenhuma issue encontrada</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(issue => createIssueCard(issue, false)).join('');
+        }
+
+        function createIssueCard(issue, inSprint) {
+            const typeClass = getTypeClass(issue.type);
+            const weightClass = issue.weightSuggested ? 'suggested' : (issue.weightEdited ? 'edited' : '');
+            const weight = issue.weight || '?';
+            const newCardStyle = issue.isNew ? 'border-color: var(--accent-purple); border-width: 2px;' : '';
+
+            return `
+                <div class="issue-card" data-id="${issue.id}" style="${newCardStyle}">
+                    <div class="issue-card-header">
+                        ${issue.isNew
+                            ? `<span class="issue-id" style="color: var(--accent-purple);">${issue.hasPrioridade ? '<span style="color: var(--accent-red); margin-right: 4px;">★</span>' : ''}${issue.id}</span>`
+                            : `<a class="issue-id" href="https://grupovoalle.youtrack.cloud/issue/${issue.id}" target="_blank">${issue.hasPrioridade ? '<span style="color: var(--accent-red); margin-right: 4px;">★</span>' : ''}${issue.id}</a>`
+                        }
+                        <span class="issue-type ${typeClass}">${issue.type}</span>
+                    </div>
+                    <div class="issue-title">${issue.summary}</div>
+                    <div class="issue-footer">
+                        <span class="issue-status">${issue.status}</span>
+                        <span class="issue-weight">
+                            Peso: <span class="weight-badge ${weightClass}" onclick="openWeightModal('${issue.id}')">${weight}</span>
+                        </span>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; display: flex; justify-content: space-between;">
+                        <span>${issue.atendente || 'Sem atendente'}</span>
+                        <span style="color: ${isOverdue(issue.dataRepactuada) ? 'var(--accent-red)' : 'var(--text-secondary)'}">
+                            ${issue.dataRepactuada || '-'}
+                        </span>
+                    </div>
+                    <div class="issue-actions">
+                        ${inSprint
+                            ? `<button class="btn btn-danger" onclick="removeFromSprint('${issue.id}')">Remover</button>`
+                            : `<button class="btn btn-primary" onclick="addToSprint('${issue.id}')">+ Adicionar</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTypeClass(type) {
+            const types = {
+                'Epic': 'type-epic',
+                'User Story': 'type-user-story',
+                'Incident': 'type-incident',
+                'Tech Story': 'type-tech-story',
+                'Automation': 'type-automation',
+                'Quality Assurance': 'type-quality-assurance'
+            };
+            return types[type] || 'type-user-story';
+        }
+
+        function addToSprint(issueId) {
+            const issueIndex = currentBacklogIssues.findIndex(i => i.id === issueId);
+            if (issueIndex === -1) return;
+
+            const issue = currentBacklogIssues[issueIndex];
+            currentBacklogIssues.splice(issueIndex, 1);
+            currentSprintIssues.push(issue);
+
+            addChange({
+                type: 'add',
+                issueId: issue.id,
+                summary: issue.summary,
+                weight: issue.weight
+            });
+
+            renderSprintIssues();
+            renderBacklogIssues();
+            updateCapacity();
+            saveState();
+        }
+
+        function removeFromSprint(issueId) {
+            const issueIndex = currentSprintIssues.findIndex(i => i.id === issueId);
+            if (issueIndex === -1) return;
+
+            const issue = currentSprintIssues[issueIndex];
+            currentSprintIssues.splice(issueIndex, 1);
+            currentBacklogIssues.push(issue);
+
+            addChange({
+                type: 'remove',
+                issueId: issue.id,
+                summary: issue.summary
+            });
+
+            renderSprintIssues();
+            renderBacklogIssues();
+            updateCapacity();
+            saveState();
+        }
+
+        function openWeightModal(issueId) {
+            editingIssueId = issueId;
+            const issue = [...currentSprintIssues, ...currentBacklogIssues].find(i => i.id === issueId);
+            if (!issue) return;
+
+            document.getElementById('modal-issue-id').textContent = `${issue.id} - ${issue.summary}`;
+
+            document.querySelectorAll('.weight-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (parseInt(opt.dataset.weight) === issue.weight) {
+                    opt.classList.add('selected');
+                    selectedWeight = issue.weight;
+                }
+            });
+
+            document.getElementById('weight-modal').classList.add('active');
+        }
+
+        function closeWeightModal() {
+            document.getElementById('weight-modal').classList.remove('active');
+            editingIssueId = null;
+            selectedWeight = null;
+        }
+
+        function saveWeight() {
+            if (!editingIssueId || selectedWeight === null) return;
+
+            let issue = currentSprintIssues.find(i => i.id === editingIssueId);
+            if (!issue) {
+                issue = currentBacklogIssues.find(i => i.id === editingIssueId);
+            }
+
+            if (issue) {
+                const oldWeight = issue.weight;
+                issue.weight = selectedWeight;
+                issue.weightEdited = true;
+                issue.weightSuggested = false;
+
+                addChange({
+                    type: 'edit',
+                    issueId: issue.id,
+                    summary: issue.summary,
+                    oldWeight: oldWeight,
+                    newWeight: selectedWeight
+                });
+
+                renderSprintIssues();
+                renderBacklogIssues();
+                updateCapacity();
+                saveState();
+            }
+
+            closeWeightModal();
+        }
+
+        function updateTotalCapacity(value) {
+            totalCapacity = parseInt(value) || 62;
+            updateCapacity();
+            saveState();
+            showToast(`Capacidade alterada para ${totalCapacity} pontos`, 'success');
+        }
+
+        function updateCapacity() {
+            const used = currentSprintIssues.reduce((sum, issue) => sum + (issue.weight || 0), 0);
+            const percent = Math.min(100, Math.round((used / totalCapacity) * 100));
+
+            document.getElementById('used-capacity').textContent = used;
+            document.getElementById('capacity-percent').textContent = `${percent}%`;
+
+            const fill = document.getElementById('capacity-fill');
+            const display = document.getElementById('capacity-display');
+
+            fill.style.width = `${Math.min(100, percent)}%`;
+
+            fill.classList.remove('warning', 'danger');
+            display.classList.remove('warning', 'danger');
+
+            if (used > totalCapacity) {
+                fill.classList.add('danger');
+                display.classList.add('danger');
+            } else if (percent > 80) {
+                fill.classList.add('warning');
+                display.classList.add('warning');
+            }
+        }
+
+        function addChange(change) {
+            const existingIndex = changes.findIndex(c => c.issueId === change.issueId && c.type === change.type);
+
+            if (existingIndex !== -1) {
+                const existing = changes[existingIndex];
+                if ((existing.type === 'add' && change.type === 'remove') ||
+                    (existing.type === 'remove' && change.type === 'add')) {
+                    changes.splice(existingIndex, 1);
+                } else {
+                    changes[existingIndex] = change;
+                }
+            } else {
+                changes.push(change);
+            }
+
+            renderChanges();
+        }
+
+        function renderChanges() {
+            const section = document.getElementById('changes-section');
+            const list = document.getElementById('changes-list');
+            const count = document.getElementById('changes-count');
+
+            if (changes.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            count.textContent = changes.length;
+
+            list.innerHTML = changes.map((change, index) => {
+                let icon, text;
+                switch (change.type) {
+                    case 'add':
+                        icon = '<div class="change-icon add">+</div>';
+                        text = `<strong>${change.issueId}</strong>: Adicionar a sprint (Peso: ${change.weight || '?'})`;
+                        break;
+                    case 'remove':
+                        icon = '<div class="change-icon remove">-</div>';
+                        text = `<strong>${change.issueId}</strong>: Remover da sprint`;
+                        break;
+                    case 'edit':
+                        icon = '<div class="change-icon edit">✎</div>';
+                        text = `<strong>${change.issueId}</strong>: Peso ${change.oldWeight || '?'} → ${change.newWeight}`;
+                        break;
+                    case 'create':
+                        icon = '<div class="change-icon add" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">★</div>';
+                        text = `<strong>CRIAR</strong>: ${change.summary} (${change.issueType})`;
+                        break;
+                }
+
+                return `
+                    <div class="change-item">
+                        ${icon}
+                        <span>${text}</span>
+                        <span class="change-undo" onclick="undoChange(${index})">✕</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function undoChange(index) {
+            const change = changes[index];
+
+            if (change.type === 'add') {
+                const issueIndex = currentSprintIssues.findIndex(i => i.id === change.issueId);
+                if (issueIndex !== -1) {
+                    const issue = currentSprintIssues.splice(issueIndex, 1)[0];
+                    currentBacklogIssues.push(issue);
+                }
+            } else if (change.type === 'remove') {
+                const issueIndex = currentBacklogIssues.findIndex(i => i.id === change.issueId);
+                if (issueIndex !== -1) {
+                    const issue = currentBacklogIssues.splice(issueIndex, 1)[0];
+                    currentSprintIssues.push(issue);
+                }
+            } else if (change.type === 'edit') {
+                let issue = [...currentSprintIssues, ...currentBacklogIssues].find(i => i.id === change.issueId);
+                if (issue) {
+                    issue.weight = change.oldWeight;
+                    issue.weightEdited = false;
+                }
+            } else if (change.type === 'create') {
+                // Remove the new card from sprint
+                const issueIndex = currentSprintIssues.findIndex(i => i.id === change.issueId);
+                if (issueIndex !== -1) {
+                    currentSprintIssues.splice(issueIndex, 1);
+                }
+            }
+
+            changes.splice(index, 1);
+
+            renderSprintIssues();
+            renderBacklogIssues();
+            updateCapacity();
+            renderChanges();
+            saveState();
+        }
+
+        function clearChanges() {
+            currentSprintIssues = JSON.parse(JSON.stringify(sprintIssues));
+            currentBacklogIssues = JSON.parse(JSON.stringify(backlogIssues));
+            changes = [];
+
+            renderSprintIssues();
+            renderBacklogIssues();
+            updateCapacity();
+            renderChanges();
+            clearSavedState();
+
+            showToast('Alteracoes canceladas e estado limpo', 'success');
+        }
+
+        function exportJSON() {
+            const output = {
+                description: 'Backup completo do planejamento da sprint',
+                sprintName: '{{SPRINT_NAME}}',
+                generatedAt: new Date().toISOString(),
+                totalCapacity: totalCapacity,
+                usedCapacity: currentSprintIssues.reduce((sum, i) => sum + (i.weight || 0), 0),
+                availableCapacity: totalCapacity - currentSprintIssues.reduce((sum, i) => sum + (i.weight || 0), 0),
+                pendingChanges: changes,
+                sprintIssues: currentSprintIssues.map(i => ({
+                    id: i.id,
+                    summary: i.summary,
+                    type: i.type,
+                    status: i.status,
+                    weight: i.weight,
+                    atendente: i.atendente
+                })),
+                backlogIssues: currentBacklogIssues.map(i => ({
+                    id: i.id,
+                    summary: i.summary,
+                    type: i.type,
+                    weight: i.weight
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(output, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sprint-planning-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showToast('Backup exportado', 'success');
+        }
+
+        function showApplyModal() {
+            const output = generateYouTrackCommands();
+            document.getElementById('apply-output').textContent = JSON.stringify(output, null, 2);
+            document.getElementById('apply-modal').classList.add('active');
+        }
+
+        function closeApplyModal() {
+            document.getElementById('apply-modal').classList.remove('active');
+        }
+
+        function generateYouTrackCommands() {
+            return {
+                description: 'Comandos para aplicar no YouTrack via MCP',
+                changes: changes.map(change => {
+                    if (change.type === 'edit') {
+                        return {
+                            action: 'update_issue',
+                            issueId: change.issueId,
+                            fields: [
+                                { name: 'Peso', value: `Peso ${change.newWeight}` }
+                            ]
+                        };
+                    } else if (change.type === 'add') {
+                        return {
+                            action: 'update_issue',
+                            issueId: change.issueId,
+                            fields: [
+                                { name: 'State', value: 'Downstream' },
+                                { name: 'Status', value: 'Backlog' }
+                            ]
+                        };
+                    } else if (change.type === 'remove') {
+                        return {
+                            action: 'update_issue',
+                            issueId: change.issueId,
+                            fields: [
+                                { name: 'State', value: 'Upstream' }
+                            ]
+                        };
+                    } else if (change.type === 'create') {
+                        return {
+                            action: 'create_issue',
+                            project: 'ORN',
+                            summary: change.summary,
+                            type: change.issueType,
+                            fields: [
+                                { name: 'State', value: 'Downstream' },
+                                { name: 'Status', value: 'Backlog' },
+                                change.weight ? { name: 'Peso', value: `Peso ${change.weight}` } : null,
+                                change.dataRepactuada ? { name: 'Data repactuada', value: change.dataRepactuada } : null,
+                                change.hasPrioridade ? { name: 'Tags', value: 'Prioridade' } : null
+                            ].filter(Boolean)
+                        };
+                    }
+                })
+            };
+        }
+
+        function copyToClipboard() {
+            const output = generateYouTrackCommands();
+            navigator.clipboard.writeText(JSON.stringify(output, null, 2)).then(() => {
+                showToast('Copiado! Cole no chat do Claude para aplicar', 'success');
+            });
+        }
+
+        // New Card functions
+        let newCardCounter = 1;
+
+        function openNewCardModal() {
+            document.getElementById('new-card-summary').value = '';
+            document.getElementById('new-card-type').value = 'Incident';
+            document.getElementById('new-card-weight').value = '';
+            document.getElementById('new-card-date').value = '';
+            document.getElementById('new-card-priority').checked = false;
+            document.getElementById('new-card-modal').classList.add('active');
+        }
+
+        function closeNewCardModal() {
+            document.getElementById('new-card-modal').classList.remove('active');
+        }
+
+        function createNewCard() {
+            const summary = document.getElementById('new-card-summary').value.trim();
+            const type = document.getElementById('new-card-type').value;
+            const weightVal = document.getElementById('new-card-weight').value;
+            const dateVal = document.getElementById('new-card-date').value;
+            const hasPriority = document.getElementById('new-card-priority').checked;
+
+            if (!summary) {
+                showToast('Titulo e obrigatorio', 'error');
+                return;
+            }
+
+            // Format date to DD/MM/YYYY
+            let dataRepactuada = null;
+            if (dateVal) {
+                const [year, month, day] = dateVal.split('-');
+                dataRepactuada = `${day}/${month}/${year}`;
+            }
+
+            const newCard = {
+                id: `NOVO-${newCardCounter++}`,
+                summary: summary,
+                type: type,
+                status: 'Novo',
+                atendente: '',
+                weight: weightVal ? parseInt(weightVal) : null,
+                dataRepactuada: dataRepactuada,
+                hasPrioridade: hasPriority,
+                isNew: true
+            };
+
+            // Add to sprint (new cards go directly to sprint)
+            currentSprintIssues.push(newCard);
+
+            // Add change
+            addChange({
+                type: 'create',
+                issueId: newCard.id,
+                summary: newCard.summary,
+                issueType: newCard.type,
+                weight: newCard.weight,
+                dataRepactuada: newCard.dataRepactuada,
+                hasPrioridade: newCard.hasPrioridade
+            });
+
+            closeNewCardModal();
+            renderSprintIssues();
+            updateCapacity();
+            saveState();
+            showToast('Card criado (pendente no YouTrack)', 'success');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
