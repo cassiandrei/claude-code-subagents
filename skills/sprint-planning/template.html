@@ -336,6 +336,21 @@
             color: var(--accent-green);
         }
 
+        .atendente-field {
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .atendente-field:hover {
+            background: var(--bg-hover);
+            color: var(--accent-blue);
+        }
+
+        .atendente-field.edited {
+            color: var(--accent-green);
+        }
+
         .issue-actions {
             display: flex;
             gap: 8px;
@@ -920,6 +935,30 @@
         </div>
     </div>
 
+    <!-- Atendente Edit Modal -->
+    <div class="modal-overlay" id="atendente-modal">
+        <div class="modal" style="width: 450px;">
+            <div class="modal-header">
+                <span class="modal-title">Editar Atendente</span>
+                <span class="modal-close" onclick="closeAtendenteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 13px;">
+                    Issue: <strong id="atendente-modal-issue-id"></strong>
+                </p>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 6px; font-size: 12px; color: var(--text-secondary);">Atendente(s)</label>
+                    <input type="text" id="atendente-input" class="search-input" style="width: 100%;" placeholder="Ex: alexei.secretti, walter.marinho">
+                    <p style="margin-top: 6px; font-size: 11px; color: var(--text-secondary);">Separe multiplos atendentes por virgula</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeAtendenteModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveAtendente()">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toast">
         <span id="toast-message"></span>
@@ -1196,7 +1235,7 @@
                         </span>
                     </div>
                     <div style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; display: flex; justify-content: space-between;">
-                        <span>${issue.atendente || 'Sem atendente'}</span>
+                        <span class="atendente-field ${issue.atendenteEdited ? 'edited' : ''}" onclick="openAtendenteModal('${issue.id}')" style="cursor: pointer; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${issue.atendente || 'Clique para editar'}">${issue.atendente || 'Sem atendente'}</span>
                         <span style="color: ${isOverdue(issue.dataRepactuada) ? 'var(--accent-red)' : 'var(--text-secondary)'}">
                             ${issue.dataRepactuada || '-'}
                         </span>
@@ -1319,6 +1358,55 @@
             closeWeightModal();
         }
 
+        function openAtendenteModal(issueId) {
+            editingIssueId = issueId;
+            const issue = [...currentSprintIssues, ...currentBacklogIssues].find(i => i.id === issueId);
+            if (!issue) return;
+
+            document.getElementById('atendente-modal-issue-id').textContent = `${issue.id} - ${issue.summary}`;
+            document.getElementById('atendente-input').value = issue.atendente || '';
+
+            document.getElementById('atendente-modal').classList.add('active');
+            document.getElementById('atendente-input').focus();
+        }
+
+        function closeAtendenteModal() {
+            document.getElementById('atendente-modal').classList.remove('active');
+            editingIssueId = null;
+        }
+
+        function saveAtendente() {
+            if (!editingIssueId) return;
+
+            const newAtendente = document.getElementById('atendente-input').value.trim();
+
+            let issue = currentSprintIssues.find(i => i.id === editingIssueId);
+            if (!issue) {
+                issue = currentBacklogIssues.find(i => i.id === editingIssueId);
+            }
+
+            if (issue) {
+                const oldAtendente = issue.atendente;
+                issue.atendente = newAtendente;
+                issue.atendenteEdited = true;
+
+                addChange({
+                    type: 'atendente',
+                    issueId: issue.id,
+                    summary: issue.summary,
+                    oldAtendente: oldAtendente,
+                    newAtendente: newAtendente
+                });
+
+                renderSprintIssues();
+                renderBacklogIssues();
+                saveState();
+                showToast('Atendente atualizado', 'success');
+            }
+
+            closeAtendenteModal();
+        }
+
         function updateTotalCapacity(value) {
             totalCapacity = parseInt(value) || 62;
             updateCapacity();
@@ -1400,6 +1488,10 @@
                         icon = '<div class="change-icon add" style="background: rgba(163, 113, 247, 0.2); color: var(--accent-purple);">★</div>';
                         text = `<strong>CRIAR</strong>: ${change.summary} (${change.issueType})`;
                         break;
+                    case 'atendente':
+                        icon = '<div class="change-icon edit" style="background: rgba(77, 184, 72, 0.2); color: var(--accent-green);">👤</div>';
+                        text = `<strong>${change.issueId}</strong>: Atendente "${change.oldAtendente || 'vazio'}" → "${change.newAtendente || 'vazio'}"`;
+                        break;
                 }
 
                 return `
@@ -1438,6 +1530,12 @@
                 const issueIndex = currentSprintIssues.findIndex(i => i.id === change.issueId);
                 if (issueIndex !== -1) {
                     currentSprintIssues.splice(issueIndex, 1);
+                }
+            } else if (change.type === 'atendente') {
+                let issue = [...currentSprintIssues, ...currentBacklogIssues].find(i => i.id === change.issueId);
+                if (issue) {
+                    issue.atendente = change.oldAtendente;
+                    issue.atendenteEdited = false;
                 }
             }
 
@@ -1552,6 +1650,14 @@
                                 change.dataRepactuada ? { name: 'Data repactuada', value: change.dataRepactuada } : null,
                                 change.hasPrioridade ? { name: 'Tags', value: 'Prioridade' } : null
                             ].filter(Boolean)
+                        };
+                    } else if (change.type === 'atendente') {
+                        return {
+                            action: 'update_issue',
+                            issueId: change.issueId,
+                            fields: [
+                                { name: 'Atendente', value: change.newAtendente }
+                            ]
                         };
                     }
                 })

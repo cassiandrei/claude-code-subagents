@@ -1,4 +1,10 @@
-# gv-protocols-analysis
+---
+name: gv-protocols-analysis
+description: Analisa protocolos de uma equipe e categoria específica, gerando documentação estruturada em markdown.
+user-invocable: true
+---
+
+# Análise de Protocolos - Grupo Voalle
 
 Analisa protocolos de uma equipe e categoria específica, gerando documentação estruturada em markdown.
 
@@ -209,16 +215,16 @@ Use este mapeamento para `incident_status_id`:
 Ao concluir, exiba um resumo no formato:
 
 ```
-✅ Análise concluída!
+Análise concluída!
 
-📁 Pasta: ./protocolos
-📊 Total de protocolos: XX
+Pasta: ./protocolos
+Total de protocolos: XX
    - Urgente: X
    - Alto: X
    - Médio: X
    - Baixo: X
 
-📄 Arquivos criados:
+Arquivos criados:
    - README.md (índice)
    - {lista de arquivos .md}
 ```
