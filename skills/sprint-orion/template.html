@@ -288,7 +288,33 @@
         .type-user-story, .type-userstory { background: var(--accent-blue); color: white; }
         .type-task { background: var(--accent-green); color: white; }
         .type-bug { background: var(--accent-red); color: white; }
-        .type-incident { background: var(--accent-orange); color: white; }
+        .type-incident { background: var(--accent-red); color: white; }
+        .type-tech-story, .type-techstory { background: #6e7681; color: white; }
+        .type-automation { background: #388bfd; color: white; }
+        .type-quality-assurance, .type-qualityassurance { background: #a371f7; color: white; }
+
+        /* Issue Status Badge - SEMPRE EXIBIDO NO CARD */
+        .issue-status {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .issue-status.status-backlog { background: var(--bg-tertiary); color: var(--text-secondary); }
+        .issue-status.status-in-progress { background: rgba(210, 153, 34, 0.2); color: var(--accent-yellow); border-color: var(--accent-yellow); }
+        .issue-status.status-review { background: rgba(88, 166, 255, 0.2); color: var(--accent-blue); border-color: var(--accent-blue); }
+        .issue-status.status-fixing { background: rgba(219, 109, 40, 0.2); color: var(--accent-orange); border-color: var(--accent-orange); }
+        .issue-status.status-qa { background: rgba(163, 113, 247, 0.2); color: var(--accent-purple); border-color: var(--accent-purple); }
+        .issue-status.status-validation { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); border-color: var(--accent-green); }
+        .issue-status.status-packaging { background: rgba(63, 185, 80, 0.3); color: var(--accent-green); border-color: var(--accent-green); }
+        .issue-status.status-blocked { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); border-color: var(--accent-red); }
+        .issue-status.status-waiting { background: rgba(219, 109, 40, 0.15); color: var(--accent-orange); border-color: var(--accent-orange); }
 
         .issue-title {
             font-size: 13px;
