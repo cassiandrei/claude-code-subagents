@@ -84,6 +84,7 @@ Analisar a US no YouTrack:
 - [ ] Description está clara e completa?
 - [ ] Critérios de aceite estão definidos?
 - [ ] Há dependências não resolvidas?
+- [ ] Tudo que foi modificado no código está coberto na US?
 
 **Rastreabilidade:**
 - [ ] Tasks relacionadas estão vinculadas?
